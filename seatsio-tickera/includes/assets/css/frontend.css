@@ -1,0 +1,42 @@
+@media (min-width: 768px) {
+  div#seating_cart_info {
+    position: fixed;
+    width: 300px;
+    top: 30vh;
+    left: 40px;
+    background: white;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    padding: 25px;
+  }
+}
+.section_name_ar h4{
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 30px;
+}
+.section_name_ar h4 span{
+    font-weight: 500 !important;
+}
+button#add-to-cart {
+    padding: 15px 30px;
+    background: #0073aa;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    cursor: pointer;
+}
+
+button#add-to-cart:hover {
+    background-color: white;
+    border-color: #0073aa !important;
+    color: #0073aa;
+
+ }
+ .tickera-checkout tbody tr td p{
+  line-height: 1.5;
+ }
