@@ -1,6 +1,13 @@
 <?php
 // templates/mapping-page.php
 ?>
+<div class="seatsio_info_wrapper_ar">
+    <div class="seatsio_info_ar">
+        <p>Shortcode to display the seating chart : <code>[seatsio_chart event_key="seat.io_event_key"]</code>
+        </p>
+    </div>
+
+</div>
 <div class="ticket-mapping-page-am">
     <h1>Map Seats.io Categories to Tickera Tickets</h1>
     <form id="maping_form_am" method="post">

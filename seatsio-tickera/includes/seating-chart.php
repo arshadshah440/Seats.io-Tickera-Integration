@@ -211,7 +211,7 @@ function render_seatsio_chart($atts)
                 success: function(response) {
                     console.log(response);
                     // Redirect to cart page (adjust URL as needed)
-                    // window.location.href = "/tickets-cart/";
+                    window.location.href = "/cart/";
                 },
                 error: function(error) {
                     console.error("Error:", error);

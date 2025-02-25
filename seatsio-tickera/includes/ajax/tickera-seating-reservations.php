@@ -158,20 +158,68 @@ class SeatsioCartManager
         }
     }
 
+    // private function process_woo_products($products)
+    // {
+    //     foreach ($products as $product) {
+    //         WC()->cart->add_to_cart(
+    //             $product['product_id'],
+    //             $product['quantity'],
+    //             0,
+    //             [],
+    //             [
+    //                 'custom_meta' => $product['custom_meta'],
+    //                 'seats' => $product['seats'],
+    //                 // 'event_id' => $product['event_id'],
+    //             ]
+    //         );
+    //     }
+    // }
+
     private function process_woo_products($products)
     {
+        // Track added seats to avoid duplicates
+        $added_seats = [];
+
+        // Get the current cart contents
+        $cart = WC()->cart->get_cart();
+
+        // Scan the cart for existing seats
+        foreach ($cart as $cart_item_key => $cart_item) {
+            if (isset($cart_item['seats'])) {
+                foreach ($cart_item['seats'] as $seat) {
+                    $added_seats[] = $seat; // Add existing seats to the tracking array
+                }
+            }
+        }
+
+        // Process new products
         foreach ($products as $product) {
-            WC()->cart->add_to_cart(
-                $product['product_id'],
-                $product['quantity'],
-                0,
-                [],
-                [
-                    'custom_meta' => $product['custom_meta'],
-                    'seats' => $product['seats'],
-                    'event_id' => $product['event_id'],
-                ]
-            );
+            // Get the seats for the current product
+            $seats = $product['seats'];
+
+            // Loop through each seat
+            foreach ($seats as $seat) {
+                // Check if the seat has already been added (either in this session or in the cart)
+                if (in_array($seat, $added_seats)) {
+                    continue; // Skip this seat if it's already added
+                }
+
+                // Add the seat to the list of added seats
+                $added_seats[] = $seat;
+
+                // Add a new product to the cart for this seat
+                WC()->cart->add_to_cart(
+                    $product['product_id'], // Product ID
+                    1, // Quantity (1 seat per product)
+                    0, // Variation ID (if applicable)
+                    [], // Variation data (if applicable)
+                    [
+                        'custom_meta' => $product['custom_meta'], // Custom meta data
+                        'seats' => [$seat], // Add only this seat
+                        'event_id' => $product['event_id'], // Event ID (if needed)
+                    ]
+                );
+            }
         }
     }
 
@@ -304,6 +352,8 @@ class SeatsioCartManager
     public function book_seats_on_order_creation($order_id)
     {
         $order = wc_get_order($order_id);
+
+        error_log("Order from thanks page ID: " . $order_id);
 
         foreach ($order->get_items() as $item) {
             $event_key = $item->get_meta('event_id');
