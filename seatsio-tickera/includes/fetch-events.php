@@ -1,28 +1,44 @@
 <?php
+/**
+ * Class SeatsioTickeraEvents
+ *
+ * Synchronizes events from the Seats.io API and creates or updates corresponding Tickera events.
+ */
 class SeatsioTickeraEvents
 {
+    /**
+     * @var string|null Seats.io API key
+     */
     private $api_key;
+
+    /**
+     * @var string Base URL for the Seats.io API
+     */
     private $api_base_url = 'https://api-eu.seatsio.net';
 
+    /**
+     * SeatsioTickeraEvents constructor.
+     */
     public function __construct()
     {
         $this->api_key = get_option('seatsio_secret_key');
         $this->init_hooks();
     }
 
+    /**
+     * Initialize WordPress hooks.
+     */
     private function init_hooks()
     {
         add_action('init', [$this, 'create_events_from_seatsio']);
-
-        // Optional: Add hook for manual sync trigger
         add_action('admin_post_sync_seatsio_events', [$this, 'handle_manual_sync']);
         add_action('admin_post_nopriv_sync_seatsio_events', [$this, 'handle_manual_sync']);
     }
 
     /**
-     * Fetch events from Seats.io API
+     * Fetch events from the Seats.io API.
      *
-     * @return array Array of events from Seats.io
+     * @return array Array of Seats.io event data
      */
     public function fetch_events()
     {
@@ -52,7 +68,7 @@ class SeatsioTickeraEvents
     }
 
     /**
-     * Create or update Tickera events based on Seats.io events
+     * Loop through all Seats.io events and create or update Tickera events accordingly.
      */
     public function create_events_from_seatsio()
     {
@@ -64,7 +80,7 @@ class SeatsioTickeraEvents
     }
 
     /**
-     * Process a single Seats.io event
+     * Process a single Seats.io event to create or update a Tickera event.
      *
      * @param array $event Event data from Seats.io
      * @return int|false Post ID on success, false on failure
@@ -74,7 +90,6 @@ class SeatsioTickeraEvents
         $event_name = $event['name'] ?? "Event " . $event['id'];
         $event_key = $event['key'];
 
-        // Check for existing event
         $existing_event = $this->get_existing_event($event_name);
 
         if ($existing_event) {
@@ -85,10 +100,10 @@ class SeatsioTickeraEvents
     }
 
     /**
-     * Get existing event by title
+     * Retrieve existing Tickera event by title.
      *
      * @param string $event_name Event title
-     * @return WP_Post|false Post object if exists, false otherwise
+     * @return WP_Post|false WP_Post object if found, false otherwise
      */
     private function get_existing_event($event_name)
     {
@@ -96,23 +111,20 @@ class SeatsioTickeraEvents
     }
 
     /**
-     * Update existing event with new data
+     * Update an existing Tickera event's meta data.
      *
-     * @param WP_Post $existing_event Existing event post object
+     * @param WP_Post $existing_event The existing event post object
      * @param string $event_key Seats.io event key
      * @return int Post ID
      */
     private function update_existing_event($existing_event, $event_key)
     {
         update_post_meta($existing_event->ID, '_seatsio_event_key', $event_key);
-
-        // Optional: Update other event metadata here
-
         return $existing_event->ID;
     }
 
     /**
-     * Create new Tickera event
+     * Create a new Tickera event based on Seats.io data.
      *
      * @param string $event_name Event title
      * @param string $event_key Seats.io event key
@@ -139,7 +151,7 @@ class SeatsioTickeraEvents
     }
 
     /**
-     * Handle manual sync request
+     * Manually trigger a sync from the WordPress admin.
      */
     public function handle_manual_sync()
     {
@@ -154,9 +166,9 @@ class SeatsioTickeraEvents
     }
 
     /**
-     * Log error messages
+     * Log error messages to the debug log.
      *
-     * @param string $message Error message to log
+     * @param string $message Error message
      */
     private function log_error($message)
     {
@@ -166,10 +178,10 @@ class SeatsioTickeraEvents
     }
 
     /**
-     * Get event key for a Tickera event
+     * Retrieve the Seats.io event key for a specific Tickera event.
      *
-     * @param int $event_id Tickera event ID
-     * @return string|false Event key if exists, false otherwise
+     * @param int $event_id The Tickera event post ID
+     * @return string|false Event key if available, false otherwise
      */
     public function get_event_key($event_id)
     {
